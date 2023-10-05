@@ -1,4 +1,4 @@
 {
-  "*.{js,ts}": "eslint --cache --fix",
+  "*.{js,ts}": "eslint --cache --fix --ignore-pattern 'bin'",
   "**/*": "prettier --write --ignore-unknown"
 }

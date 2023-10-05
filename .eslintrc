@@ -16,17 +16,18 @@
     "sourceType": "module",
     "project": ["./tsconfig.json"]
   },
+  "ignorePatterns": ["./bin/index.js"],
   "rules": {
-    "indent": ["error", 2],
     "linebreak-style": ["error", "unix"],
     "quotes": ["error", "single"],
     "semi": ["error", "always"],
     "no-restricted-syntax": "off",
     "consistent-return": "off",
     "class-methods-use-this": "off",
-    "no-console": "error",
+    "no-console": "off",
     "prefer-default-export": "off",
     "import/prefer-default-export": "off",
+    "import/extensions": "off",
     "import/no-cycle": "off",
     "import/no-extraneous-dependencies": "off",
     "import/order": [

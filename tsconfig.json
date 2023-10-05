@@ -2,11 +2,9 @@
   "compilerOptions": {
     "resolveJsonModule": true,
     "incremental": true,
-    "module": "esnext",
+    "target": "ES5",
     "allowJs": true,
-    "declaration": true,
-    "declarationMap": true,
-    "sourceMap": true,
+    "sourceMap": false,
     "outDir": "dist",
     "strict": true,
     "moduleResolution": "node",
@@ -14,9 +12,9 @@
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
     "paths": {
-      "@/*": ["./src/*"]
+      "@/*": ["./src/*.ts"]
     }
   },
   "include": ["src"],
-  "exclude": ["node_modules", "dist", "tests"]
+  "exclude": ["node_modules", "dist", "tests", "bin"]
 }
