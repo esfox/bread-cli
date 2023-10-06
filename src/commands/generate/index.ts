@@ -1,3 +1,4 @@
+import { generateCode } from './generators/code';
 import { generateMigration } from './generators/migration';
 
 import { exitAfter } from '../../helpers';
@@ -7,8 +8,7 @@ import prompts from 'prompts';
 
 enum GenerateType {
   Migration,
-  CrudAll,
-  CrudOne,
+  Code,
 }
 
 async function run() {
@@ -22,14 +22,8 @@ async function run() {
         value: GenerateType.Migration,
       },
       {
-        title: 'CRUD code, all database tables',
-        value: GenerateType.CrudAll,
-        description: 'CRUD boilerplate code for all the migrated database tables',
-      },
-      {
-        title: 'CRUD code, one database table',
-        value: GenerateType.CrudOne,
-        description: 'CRUD boilerplate code for one specified migrated database table',
+        title: 'Code from an introspected table in a database',
+        value: GenerateType.Code,
       },
     ],
   });
@@ -39,12 +33,8 @@ async function run() {
       await generateMigration();
       break;
 
-    case GenerateType.CrudAll:
-      console.log('todo');
-      break;
-
-    case GenerateType.CrudOne:
-      console.log('todo');
+    case GenerateType.Code:
+      await generateCode();
       break;
 
     default:

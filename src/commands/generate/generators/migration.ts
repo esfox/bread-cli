@@ -1,22 +1,13 @@
 import { TemplateName } from '../constants';
-import { hygenRun } from '../helpers';
+import { hygenRun } from '../helpers/code';
+import { getDirectoriesInCwd } from '../helpers/files';
 
-import { globSync } from 'fast-glob';
 import prompts from 'prompts';
 
 import { join } from 'path';
 
 export async function generateMigration() {
-  const cwd = process.cwd();
-  const paths = globSync(['./**/*'], {
-    ignore: ['node_modules'],
-    onlyDirectories: true,
-    suppressErrors: true,
-    cwd,
-  }).sort();
-
-  paths.unshift('.');
-
+  const paths = getDirectoriesInCwd();
   const pathChoices: prompts.Choice[] = paths.map((path) => ({
     title: path,
     value: path,
@@ -52,7 +43,7 @@ export async function generateMigration() {
   await hygenRun({
     templatesPath: join(__dirname, '..', 'templates'),
     templatesName: TemplateName.Migration,
-    outputPath: join(cwd, migrationsPath as string),
+    outputPath: join(process.cwd(), migrationsPath as string),
     templateData: { migrationsPath, migrationName, timestamp },
   });
 }
