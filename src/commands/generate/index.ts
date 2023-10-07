@@ -11,7 +11,13 @@ enum GenerateType {
   Code = 'code',
 }
 
-async function run(type: string | undefined) {
+type Option = {
+  preGenerate: string;
+};
+
+async function run(type: string | undefined, options: Option) {
+  const { preGenerate } = options;
+
   let generateType = type;
   if (!generateType) {
     const { type: typeInput } = await prompts({
@@ -39,7 +45,7 @@ async function run(type: string | undefined) {
       break;
 
     case GenerateType.Code:
-      await generateCode();
+      await generateCode(preGenerate);
       break;
 
     default:
@@ -53,4 +59,5 @@ program
   .alias('g')
   .description('Generate code')
   .argument('[type]')
+  .option('-pre, --pre-generate <command>', 'Command/s to run before code generation')
   .action(exitAfter(run));

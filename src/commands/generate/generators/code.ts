@@ -13,6 +13,7 @@ import { globSync } from 'fast-glob';
 import { ColumnMetadata, TableMetadata } from 'kysely';
 import prompts from 'prompts';
 
+import { execSync } from 'child_process';
 import { join } from 'path';
 
 async function validateDatabaseConnection() {
@@ -141,7 +142,7 @@ async function getTemplateData(table: TableMetadata) {
   };
 }
 
-export async function generateCode() {
+export async function generateCode(preGenerate?: string) {
   const connectedToDatabase = await validateDatabaseConnection();
   if (!connectedToDatabase) {
     return;
@@ -160,6 +161,11 @@ export async function generateCode() {
   }
 
   const templateData = await getTemplateData(table);
+
+  if (preGenerate) {
+    const stdout = execSync(preGenerate).toString();
+    console.log(stdout);
+  }
 
   const { actions } = await hygenRun({
     templatesPath,
