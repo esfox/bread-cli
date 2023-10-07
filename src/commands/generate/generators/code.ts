@@ -9,6 +9,7 @@ import {
   checkConnection,
 } from '../helpers/database';
 
+import { globSync } from 'fast-glob';
 import { ColumnMetadata, TableMetadata } from 'kysely';
 import prompts from 'prompts';
 
@@ -17,7 +18,7 @@ import { join } from 'path';
 async function validateDatabaseConnection() {
   if (!databaseConnectionString) {
     console.log('❌ No database connection string');
-    return false;
+    return;
   }
 
   try {
@@ -25,7 +26,7 @@ async function validateDatabaseConnection() {
   } catch (error) {
     console.debug(error);
     console.log('❌ Cannot connect to database');
-    return false;
+    return;
   }
 
   return true;
@@ -92,19 +93,23 @@ async function promptInputs(): Promise<
   };
 }
 
-export async function generateCode() {
-  const connectedToDatabase = await validateDatabaseConnection();
-  if (!connectedToDatabase) {
+function validateTemplates(templatesPath: string) {
+  const templateFiles = globSync(['*.ejs.t'], {
+    ignore: ['node_modules'],
+    onlyFiles: true,
+    suppressErrors: true,
+    cwd: templatesPath,
+  });
+
+  if (templateFiles.length === 0) {
+    console.log('❌ No template files');
     return;
   }
 
-  const inputs = await promptInputs();
-  if (!inputs) {
-    return;
-  }
+  return true;
+}
 
-  const { templatesPath, outputPath, table } = inputs;
-
+async function getTemplateData(table: TableMetadata) {
   const tableName = table.name;
   const primaryKeyMap = await getPrimaryKeys([tableName]);
   const primaryKey = primaryKeyMap[table.name];
@@ -129,17 +134,43 @@ export async function generateCode() {
 
   console.log(`\n⌛ Generating code for table \`${tableName}\`...`);
 
-  const templateData = {
+  return {
     tableName,
     primaryKey,
     columns,
   };
+}
 
-  await hygenRun({
+export async function generateCode() {
+  const connectedToDatabase = await validateDatabaseConnection();
+  if (!connectedToDatabase) {
+    return;
+  }
+
+  const inputs = await promptInputs();
+  if (!inputs) {
+    return;
+  }
+
+  const { templatesPath, outputPath, table } = inputs;
+
+  const hasTemplates = validateTemplates(templatesPath);
+  if (!hasTemplates) {
+    return;
+  }
+
+  const templateData = await getTemplateData(table);
+
+  const { actions } = await hygenRun({
     templatesPath,
     outputPath,
     templateData,
   });
+
+  if (actions.length === 0) {
+    console.log('❌ No code was generated');
+    return;
+  }
 
   formatCodeInFolder(outputPath);
 

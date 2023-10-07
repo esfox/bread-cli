@@ -11,7 +11,7 @@ enum GenerateType {
   Code = 'code',
 }
 
-async function run(type?: string) {
+async function run(type: string | undefined) {
   let generateType = type;
   if (!generateType) {
     const { type: typeInput } = await prompts({
@@ -52,5 +52,5 @@ program
   .command('generate')
   .alias('g')
   .description('Generate code')
-  .arguments('[type]')
+  .argument('[type]')
   .action(exitAfter(run));

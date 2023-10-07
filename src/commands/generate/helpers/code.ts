@@ -53,5 +53,9 @@ export async function hygenRun({
 
 export function formatCodeInFolder(folder: string) {
   const glob = join(folder, '**', '*');
-  execSync(`prettier --write --ignore-unknown '${glob}'`);
+  try {
+    execSync(`prettier --write --ignore-unknown '${glob}'`);
+  } catch (error) {
+    /* ignore error */
+  }
 }
