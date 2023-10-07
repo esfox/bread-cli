@@ -7,28 +7,33 @@ import { program } from 'commander';
 import prompts from 'prompts';
 
 enum GenerateType {
-  Migration,
-  Code,
+  Migration = 'migration',
+  Code = 'code',
 }
 
-async function run() {
-  const { type } = await prompts({
-    type: 'select',
-    name: 'type',
-    message: 'What should be generated?',
-    choices: [
-      {
-        title: 'Migration file',
-        value: GenerateType.Migration,
-      },
-      {
-        title: 'Code from an introspected table in a database',
-        value: GenerateType.Code,
-      },
-    ],
-  });
+async function run(type?: string) {
+  let generateType = type;
+  if (!generateType) {
+    const { type: typeInput } = await prompts({
+      type: 'select',
+      name: 'type',
+      message: 'What should be generated?',
+      choices: [
+        {
+          title: 'Migration file',
+          value: GenerateType.Migration,
+        },
+        {
+          title: 'Code from an introspected table in a database',
+          value: GenerateType.Code,
+        },
+      ],
+    });
 
-  switch (type) {
+    generateType = typeInput;
+  }
+
+  switch (generateType) {
     case GenerateType.Migration:
       await generateMigration();
       break;
@@ -38,8 +43,14 @@ async function run() {
       break;
 
     default:
+      console.log('❌ Invalid type to generate');
       break;
   }
 }
 
-program.command('generate').alias('g').description('Generate code').action(exitAfter(run));
+program
+  .command('generate')
+  .alias('g')
+  .description('Generate code')
+  .arguments('[type]')
+  .action(exitAfter(run));

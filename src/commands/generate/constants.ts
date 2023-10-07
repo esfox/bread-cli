@@ -7,6 +7,7 @@ import * as path from 'path';
 
 config();
 
+export const databaseConnectionString = process.env.DB_CONNECTION;
 export const databaseSchema = process.env.DB_SCHEMA ?? 'public';
 export const migrationFolder = path.join(__dirname, '..', 'database', 'migrations');
 
@@ -14,7 +15,7 @@ export const migrationFolder = path.join(__dirname, '..', 'database', 'migration
 export const databaseConnection = new Kysely({
   dialect: new PostgresDialect({
     pool: new Pool({
-      connectionString: process.env.DB_CONNECTION,
+      connectionString: databaseConnectionString,
     }),
   }),
 });

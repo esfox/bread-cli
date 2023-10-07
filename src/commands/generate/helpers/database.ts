@@ -2,6 +2,10 @@ import { databaseConnection, databaseSchema } from '../constants';
 
 import { sql } from 'kysely';
 
+export function checkConnection() {
+  return sql`SELECT 1`.execute(databaseConnection);
+}
+
 export async function getTables() {
   const tables = await databaseConnection.introspection.getTables({
     withInternalKyselyTables: false,

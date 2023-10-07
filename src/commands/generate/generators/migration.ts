@@ -1,6 +1,6 @@
 import { TemplateName } from '../constants';
+import { getAutocompleteFuzzySuggest, getDirectoriesInCwd } from '../helpers';
 import { hygenRun } from '../helpers/code';
-import { getDirectoriesInCwd } from '../helpers/files';
 
 import prompts from 'prompts';
 
@@ -25,6 +25,7 @@ export async function generateMigration() {
       name: 'migrationsPath',
       message: 'Path to migration files',
       choices: pathChoices,
+      suggest: getAutocompleteFuzzySuggest(),
     },
   ]);
 

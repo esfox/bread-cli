@@ -1,17 +1,44 @@
+import { databaseConnectionString } from '../constants';
+import { getAutocompleteFuzzySuggest, getDirectoriesInCwd } from '../helpers';
 import { formatCodeInFolder, hygenRun } from '../helpers/code';
-import { getTables, getPrimaryKeys, isNumberType, isBooleanType } from '../helpers/database';
-import { getDirectoriesInCwd } from '../helpers/files';
+import {
+  getTables,
+  getPrimaryKeys,
+  isNumberType,
+  isBooleanType,
+  checkConnection,
+} from '../helpers/database';
 
 import { ColumnMetadata, TableMetadata } from 'kysely';
 import prompts from 'prompts';
 
 import { join } from 'path';
 
-async function promptInputs(): Promise<{
-  templatesPath: string;
-  outputPath: string;
-  table: TableMetadata;
-}> {
+async function validateDatabaseConnection() {
+  if (!databaseConnectionString) {
+    console.log('❌ No database connection string');
+    return false;
+  }
+
+  try {
+    await checkConnection();
+  } catch (error) {
+    console.debug(error);
+    console.log('❌ Cannot connect to database');
+    return false;
+  }
+
+  return true;
+}
+
+async function promptInputs(): Promise<
+  | {
+      templatesPath: string;
+      outputPath: string;
+      table: TableMetadata;
+    }
+  | undefined
+> {
   const paths = getDirectoriesInCwd();
   const pathChoices: prompts.Choice[] = paths.map((path) => ({
     title: path,
@@ -33,24 +60,27 @@ async function promptInputs(): Promise<{
       name: 'templatesPath',
       message: 'Path of code template files',
       choices: pathChoices,
+      suggest: getAutocompleteFuzzySuggest(),
     },
     {
       type: 'autocomplete',
       name: 'outputPath',
       message: 'Path where to generate code',
       choices: pathChoices,
+      suggest: getAutocompleteFuzzySuggest(),
     },
     {
       type: 'autocomplete',
       name: 'table',
       message: 'Select the database table to introspect',
       choices: tableChoices,
+      suggest: getAutocompleteFuzzySuggest(),
       validate: (values: string[]) => values?.length !== 0 || 'Please select a table',
     },
   ]);
 
   if (!inputs.table || inputs.table.length === 0) {
-    throw new Error('Please select a table');
+    return;
   }
 
   const cwd = process.cwd();
@@ -63,7 +93,17 @@ async function promptInputs(): Promise<{
 }
 
 export async function generateCode() {
-  const { templatesPath, outputPath, table } = await promptInputs();
+  const connectedToDatabase = await validateDatabaseConnection();
+  if (!connectedToDatabase) {
+    return;
+  }
+
+  const inputs = await promptInputs();
+  if (!inputs) {
+    return;
+  }
+
+  const { templatesPath, outputPath, table } = inputs;
 
   const tableName = table.name;
   const primaryKeyMap = await getPrimaryKeys([tableName]);

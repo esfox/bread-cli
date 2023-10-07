@@ -1,5 +1,9 @@
 lockfileVersion: '6.0'
 
+settings:
+  autoInstallPeers: true
+  excludeLinksFromLockfile: false
+
 dependencies:
   commander:
     specifier: ^11.0.0
@@ -7,6 +11,9 @@ dependencies:
   dotenv:
     specifier: ^16.3.1
     version: 16.3.1
+  fast-fuzzy:
+    specifier: ^1.12.0
+    version: 1.12.0
   fast-glob:
     specifier: ^3.3.1
     version: 3.3.1
@@ -2397,6 +2404,15 @@ packages:
     engines: { node: '>=6.0.0' }
     dev: true
 
+  /fast-fuzzy@1.12.0:
+    resolution:
+      {
+        integrity: sha512-sXxGgHS+ubYpsdLnvOvJ9w5GYYZrtL9mkosG3nfuD446ahvoWEsSKBP7ieGmWIKVLnaxRDgUJkZMdxRgA2Ni+Q==,
+      }
+    dependencies:
+      graphemesplit: 2.4.4
+    dev: false
+
   /fast-glob@3.3.1:
     resolution:
       {
@@ -2770,6 +2786,16 @@ packages:
         integrity: sha512-EtKwoO6kxCL9WO5xipiHTZlSzBm7WLT627TqC/uVRd0HKmq8NXyebnNYxDoBi7wt8eTWrUrKXCOVaFq9x1kgag==,
       }
     dev: true
+
+  /graphemesplit@2.4.4:
+    resolution:
+      {
+        integrity: sha512-lKrpp1mk1NH26USxC/Asw4OHbhSQf5XfrWZ+CDv/dFVvd1j17kFgMotdJvOesmHkbFX9P9sBfpH8VogxOWLg8w==,
+      }
+    dependencies:
+      js-base64: 3.7.5
+      unicode-trie: 2.0.0
+    dev: false
 
   /has-bigints@1.0.2:
     resolution:
@@ -3318,6 +3344,13 @@ packages:
       filelist: 1.0.4
       minimatch: 3.1.2
     dev: true
+
+  /js-base64@3.7.5:
+    resolution:
+      {
+        integrity: sha512-3MEt5DTINKqfScXKfJFrRbxkrnk2AxPWGBL/ycjz4dK8iqiSJ06UxD8jh8xuh6p10TX4t2+7FsBYVxxQbMg+qA==,
+      }
+    dev: false
 
   /js-tokens@4.0.0:
     resolution:
@@ -3967,6 +4000,13 @@ packages:
     resolution:
       {
         integrity: sha512-HAKu/fG3HpHFO0AA8WE8q2g+gBJaZ9MG7fcKk+IJPLTGAD6Psw4443l+9DGRbOIh3/aXr7Phy0TjilYivJo5XQ==,
+      }
+    dev: false
+
+  /pako@0.2.9:
+    resolution:
+      {
+        integrity: sha512-NUcwaKxUxWrZLpDG+z/xZaCgQITkA/Dv4V/T6bw7VON6l1Xz/VnrBqrYjZQ12TamKHzITTfOEIYUj48y2KXImA==,
       }
     dev: false
 
@@ -4962,6 +5002,13 @@ packages:
       xtend: 4.0.2
     dev: true
 
+  /tiny-inflate@1.0.3:
+    resolution:
+      {
+        integrity: sha512-pkY1fj1cKHb2seWDy0B16HeWyczlJA9/WW3u3c4z/NiWDsO3DOU5D7nhTLE9CF0yXv/QZFY7sEJmj24dK+Rrqw==,
+      }
+    dev: false
+
   /title-case@2.1.1:
     resolution:
       {
@@ -5151,6 +5198,16 @@ packages:
       has-symbols: 1.0.3
       which-boxed-primitive: 1.0.2
     dev: true
+
+  /unicode-trie@2.0.0:
+    resolution:
+      {
+        integrity: sha512-x7bc76x0bm4prf1VLg79uhAzKw8DVboClSN5VxJuQ+LKDOVEW9CdH+VY7SP+vX7xCYQqzzgQpFqz15zeLvAtZQ==,
+      }
+    dependencies:
+      pako: 0.2.9
+      tiny-inflate: 1.0.3
+    dev: false
 
   /unique-string@3.0.0:
     resolution:
@@ -5432,7 +5489,3 @@ packages:
       }
     engines: { node: '>=12.20' }
     dev: true
-
-settings:
-  autoInstallPeers: true
-  excludeLinksFromLockfile: false
