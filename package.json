@@ -8,7 +8,8 @@
     "install:local": "npm run build && npm i -g .",
     "build": "rimraf dist && tsc && npm run cp-templates",
     "prepare": "husky install",
-    "cp-templates": "copyfiles -u 1 src/**/*.ejs.t dist"
+    "cp-templates": "copyfiles -u 1 src/**/*.ejs.t dist",
+    "prepack": "npm run build"
   },
   "bin": {
     "bread": "./bin/index.js"
@@ -28,7 +29,6 @@
     "eslint-config-prettier": "^9.0.0",
     "eslint-plugin-import": "^2.28.1",
     "husky": "^8.0.3",
-    "hygen": "^6.2.11",
     "lint-staged": "^14.0.1",
     "rimraf": "^5.0.5",
     "sucrase": "^3.34.0",
@@ -40,10 +40,15 @@
     "dotenv": "^16.3.1",
     "fast-fuzzy": "^1.12.0",
     "fast-glob": "^3.3.1",
+    "hygen": "^6.2.11",
     "inflection": "^3.0.0",
     "kysely": "^0.26.3",
     "pg": "^8.11.3",
     "prettier": "^3.0.3",
     "prompts": "^2.4.2"
-  }
+  },
+  "files": [
+    "bin/",
+    "dist/"
+  ]
 }
