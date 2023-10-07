@@ -24,4 +24,4 @@ program.name('bread');
 //   .description('Rollbacks all migrations')
 //   .action(() => {});
 
-program.parse();
+program.parse(process.argv);

@@ -13,6 +13,7 @@ enum GenerateType {
 
 type Option = {
   preGenerate: string;
+  databaseConnection?: string;
 };
 
 async function run(type: string | undefined, options: Option) {
@@ -60,4 +61,5 @@ program
   .description('Generate code')
   .argument('[type]')
   .option('-pre, --pre-generate <command>', 'Command/s to run before code generation')
+  .option('-db, --database-connection <connection>', 'Database connection string')
   .action(exitAfter(run));
