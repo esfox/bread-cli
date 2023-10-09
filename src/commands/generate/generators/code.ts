@@ -163,8 +163,16 @@ export async function generateCode(preGenerate?: string) {
   const templateData = await getTemplateData(table);
 
   if (preGenerate) {
-    const stdout = execSync(preGenerate).toString();
-    console.log(stdout);
+    try {
+      console.log(`\n⌛ Running pre-generate command:\n\`${preGenerate}\``);
+      const stdout = execSync(preGenerate).toString().trim();
+      if (stdout || stdout !== '') {
+        console.log(`\n✅ Pre-generate command result:\n${stdout}`);
+      }
+    } catch (error) {
+      console.log('❌ Pre-generate command failed. Please try again.');
+      return;
+    }
   }
 
   const { actions } = await hygenRun({
