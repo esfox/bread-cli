@@ -10,6 +10,7 @@ import {
 } from '../helpers/database';
 
 import { globSync } from 'fast-glob';
+import { capitalize } from 'inflection';
 import { ColumnMetadata, TableMetadata } from 'kysely';
 import prompts from 'prompts';
 
@@ -110,6 +111,22 @@ function validateTemplates(templatesPath: string) {
   return true;
 }
 
+function runCommand(commandType: 'pre-generate' | 'post-generate', command: string) {
+  const capitalizedCommandType = capitalize(commandType);
+  try {
+    console.log(`\n⌛ Running ${commandType} command:\n\`${command}\``);
+    const stdout = execSync(command).toString().trim();
+    if (stdout || stdout !== '') {
+      console.log(`\n✅ ${capitalizedCommandType} command result:\n${stdout}`);
+    }
+  } catch (error) {
+    console.log(`❌ ${capitalizedCommandType} command failed. Please try again.`);
+    return false;
+  }
+
+  return true;
+}
+
 async function getTemplateData(table: TableMetadata) {
   const tableName = table.name;
   const primaryKeyMap = await getPrimaryKeys([tableName]);
@@ -142,7 +159,12 @@ async function getTemplateData(table: TableMetadata) {
   };
 }
 
-export async function generateCode(preGenerate?: string) {
+export type GenerateCodeParameters = {
+  preGenerate?: string;
+  postGenerate?: string;
+};
+
+export async function generateCode({ preGenerate, postGenerate }: GenerateCodeParameters) {
   const connectedToDatabase = await validateDatabaseConnection();
   if (!connectedToDatabase) {
     return;
@@ -163,14 +185,8 @@ export async function generateCode(preGenerate?: string) {
   const templateData = await getTemplateData(table);
 
   if (preGenerate) {
-    try {
-      console.log(`\n⌛ Running pre-generate command:\n\`${preGenerate}\``);
-      const stdout = execSync(preGenerate).toString().trim();
-      if (stdout || stdout !== '') {
-        console.log(`\n✅ Pre-generate command result:\n${stdout}`);
-      }
-    } catch (error) {
-      console.log('❌ Pre-generate command failed. Please try again.');
+    const preGenerateSuccess = runCommand('pre-generate', preGenerate);
+    if (!preGenerateSuccess) {
       return;
     }
   }
@@ -184,6 +200,13 @@ export async function generateCode(preGenerate?: string) {
   if (actions.length === 0) {
     console.log('❌ No code was generated');
     return;
+  }
+
+  if (postGenerate) {
+    const postGenerateSuccess = runCommand('post-generate', postGenerate);
+    if (!postGenerateSuccess) {
+      return;
+    }
   }
 
   formatCodeInFolder(outputPath);

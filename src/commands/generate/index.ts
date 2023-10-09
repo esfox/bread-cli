@@ -1,4 +1,4 @@
-import { generateCode } from './generators/code';
+import { GenerateCodeParameters, generateCode } from './generators/code';
 import { generateMigration } from './generators/migration';
 
 import { exitAfter } from '../../helpers';
@@ -11,12 +11,8 @@ enum GenerateType {
   Code = 'code',
 }
 
-type Option = {
-  preGenerate: string;
-};
-
-async function run(type: string | undefined, options: Option) {
-  const { preGenerate } = options;
+async function run(type: string | undefined, options: GenerateCodeParameters) {
+  const { preGenerate, postGenerate } = options;
 
   let generateType = type;
   if (!generateType) {
@@ -45,7 +41,7 @@ async function run(type: string | undefined, options: Option) {
       break;
 
     case GenerateType.Code:
-      await generateCode(preGenerate);
+      await generateCode({ preGenerate, postGenerate });
       break;
 
     default:
@@ -60,4 +56,5 @@ program
   .description('Generate code')
   .argument('[type]')
   .option('-pre, --pre-generate <command>', 'Command/s to run before code generation')
+  .option('-post, --post-generate <command>', 'Command/s to run after code generation')
   .action(exitAfter(run));
