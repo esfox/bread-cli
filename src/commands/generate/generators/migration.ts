@@ -4,7 +4,12 @@ import { hygenRun } from '../helpers/code';
 
 import prompts from 'prompts';
 
-import { join } from 'path';
+import { dirname, join } from 'path';
+import { fileURLToPath } from 'url';
+
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-ignore
+const currentDirectory = dirname(fileURLToPath(import.meta.url));
 
 export async function generateMigration() {
   const paths = getDirectoriesInCwd();
@@ -42,7 +47,7 @@ export async function generateMigration() {
     .replace(/-|:|Z/g, '');
 
   await hygenRun({
-    templatesPath: join(__dirname, '..', 'templates'),
+    templatesPath: join(currentDirectory, '..', 'templates'),
     templatesName: TemplateName.Migration,
     outputPath: join(process.cwd(), migrationsPath as string),
     templateData: { migrationsPath, migrationName, timestamp },

@@ -9,7 +9,7 @@ import {
   isNumberType,
 } from '../helpers/database';
 
-import * as fastGlob from 'fast-glob';
+import fastGlob from 'fast-glob';
 import { capitalize } from 'inflection';
 import { ColumnMetadata, TableMetadata } from 'kysely';
 import prompts from 'prompts';
