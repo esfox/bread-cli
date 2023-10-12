@@ -1,15 +1,20 @@
 import { config } from 'dotenv';
-import { FileMigrationProvider, Kysely, Migrator, PostgresDialect } from 'kysely';
+import { Kysely, PostgresDialect } from 'kysely';
 import { Pool } from 'pg';
-
-import { promises as fs } from 'fs';
-import * as path from 'path';
 
 config();
 
 export const databaseConnectionString = process.env.DB_CONNECTION;
 export const databaseSchema = process.env.DB_SCHEMA ?? 'public';
-export const migrationFolder = path.join(__dirname, '..', 'database', 'migrations');
+export const migrationsPath = process.env.DB_MIGRATIONS_PATH as string;
+
+if (!databaseConnectionString) {
+  throw new Error('Please set the DB_CONNECTION environment variable');
+}
+
+if (!migrationsPath) {
+  throw new Error('Please set the DB_MIGRATIONS_PATH environment variable');
+}
 
 /* Setup database connection and migrator */
 export const databaseConnection = new Kysely({
@@ -17,15 +22,6 @@ export const databaseConnection = new Kysely({
     pool: new Pool({
       connectionString: databaseConnectionString,
     }),
-  }),
-});
-
-export const migrator = new Migrator({
-  db: databaseConnection,
-  provider: new FileMigrationProvider({
-    fs,
-    path,
-    migrationFolder,
   }),
 });
 

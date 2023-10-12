@@ -1,4 +1,4 @@
-import { databaseConnectionString } from '../constants';
+import { databaseConnectionString } from '../../../constants';
 import { getAutocompleteFuzzySuggest, getDirectoriesInCwd } from '../helpers';
 import { formatCodeInFolder, hygenRun } from '../helpers/code';
 import {

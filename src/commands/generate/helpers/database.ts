@@ -1,4 +1,4 @@
-import { databaseConnection, databaseSchema } from '../constants';
+import { databaseConnection, databaseSchema } from '../../../constants';
 
 import { sql } from 'kysely';
 

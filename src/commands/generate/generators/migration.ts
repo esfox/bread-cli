@@ -1,4 +1,4 @@
-import { TemplateName } from '../constants';
+import { TemplateName } from '../../../constants';
 import { getAutocompleteFuzzySuggest, getDirectoriesInCwd } from '../helpers';
 import { hygenRun } from '../helpers/code';
 
