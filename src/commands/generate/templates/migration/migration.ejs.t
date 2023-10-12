@@ -1,12 +1,12 @@
 ---
-to: <%= timestamp %>_<%= migrationName %>.ts
+to: <%= timestamp %>_<%= migrationName %>.js
 ---
-import { Kysely } from 'kysely';
-
-export async function up(db: Kysely<unknown>) {
+/** @param {import('kysely').Kysely} db */
+export async function up(db) {
   
 }
 
-export async function down(db: Kysely<unknown>) {
+/** @param {import('kysely').Kysely} db */
+export async function down(db) {
   
 }
