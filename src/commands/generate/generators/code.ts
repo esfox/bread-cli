@@ -98,7 +98,7 @@ async function promptInputs(): Promise<
 }
 
 function validateTemplates(templatesPath: string) {
-  const templateFiles = globSync(['*.ejs.t'], {
+  const templateFiles = globSync(['**/*.ejs.t'], {
     ignore: ['node_modules'],
     onlyFiles: true,
     suppressErrors: true,
