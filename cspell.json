@@ -1,6 +1,6 @@
 {
   "version": "0.2",
   "language": "en",
-  "words": ["kysely", "hygen", "rollbacking"],
+  "words": ["kysely", "hygen", "rollbacking", "etsc"],
   "ignorePaths": ["node_modules/", ".husky", "pnpm-lock.yaml", "package.json"]
 }

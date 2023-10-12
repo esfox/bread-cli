@@ -1,6 +1,8 @@
 import { Searcher } from 'fast-fuzzy';
-import { globSync } from 'fast-glob';
+import fastGlob from 'fast-glob';
 import { Choice } from 'prompts';
+
+const { globSync } = fastGlob;
 
 export function getDirectoriesInCwd() {
   const directories = globSync(['./**/*'], {

@@ -1,6 +1,8 @@
 import { config } from 'dotenv';
 import { Kysely, PostgresDialect } from 'kysely';
-import { Pool } from 'pg';
+import pg from 'pg';
+
+const { Pool } = pg;
 
 config();
 

@@ -2,12 +2,12 @@
   "compilerOptions": {
     "resolveJsonModule": true,
     "incremental": true,
-    "target": "ES5",
+    "target": "ESNext",
     "allowJs": true,
     "sourceMap": false,
     "outDir": "dist",
     "strict": true,
-    "moduleResolution": "node",
+    "moduleResolution": "Node",
     "esModuleInterop": true,
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
@@ -16,5 +16,9 @@
     }
   },
   "include": ["src"],
-  "exclude": ["node_modules", "dist", "tests", "bin"]
+  "exclude": ["node_modules", "dist", "tests", "bin", "etsc.config.js"],
+  "tsc-alias": {
+    "resolveFullPaths": true,
+    "verbose": false
+  }
 }

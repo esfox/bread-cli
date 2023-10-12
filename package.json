@@ -2,11 +2,12 @@
   "name": "@bread/cli",
   "author": "osairis100@gmail.com",
   "version": "0.0.1",
-  "main": "./dist/index.js",
+  "type": "module",
+  "main": "./bin/index.js",
   "scripts": {
-    "dev": "sucrase-node src",
+    "dev": "tsx src",
     "install:local": "npm run build && npm i -g .",
-    "build": "rimraf dist && tsc && npm run cp-templates",
+    "build": "rimraf dist && etsc && tsc-alias && npm run cp-templates",
     "prepare": "husky install",
     "cp-templates": "copyfiles -u 1 src/**/*.ejs.t dist",
     "prepack": "npm run build"
@@ -23,6 +24,8 @@
     "concurrently": "^8.2.1",
     "copyfiles": "^2.4.1",
     "cspell": "^7.3.7",
+    "esbuild": "^0.19.4",
+    "esbuild-node-tsc": "^2.0.5",
     "eslint": "^8.50.0",
     "eslint-config-airbnb-base": "^15.0.0",
     "eslint-config-airbnb-typescript": "^17.1.0",
@@ -31,8 +34,9 @@
     "husky": "^8.0.3",
     "lint-staged": "^14.0.1",
     "rimraf": "^5.0.5",
-    "sucrase": "^3.34.0",
+    "tsc-alias": "^1.8.8",
     "tsconfig-paths": "^4.2.0",
+    "tsx": "^3.13.0",
     "typescript": "^5.2.2"
   },
   "dependencies": {
@@ -49,6 +53,6 @@
   },
   "files": [
     "bin/",
-    "dist/"
+    "src/"
   ]
 }

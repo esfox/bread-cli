@@ -2,20 +2,22 @@ import { databaseConnectionString } from '../../../constants';
 import { getAutocompleteFuzzySuggest, getDirectoriesInCwd } from '../helpers';
 import { formatCodeInFolder, hygenRun } from '../helpers/code';
 import {
-  getTables,
-  getPrimaryKeys,
-  isNumberType,
-  isBooleanType,
   checkConnection,
+  getPrimaryKeys,
+  getTables,
+  isBooleanType,
+  isNumberType,
 } from '../helpers/database';
 
-import { globSync } from 'fast-glob';
+import * as fastGlob from 'fast-glob';
 import { capitalize } from 'inflection';
 import { ColumnMetadata, TableMetadata } from 'kysely';
 import prompts from 'prompts';
 
 import { execSync } from 'child_process';
 import { join } from 'path';
+
+const { globSync } = fastGlob;
 
 async function validateDatabaseConnection() {
   if (!databaseConnectionString) {
