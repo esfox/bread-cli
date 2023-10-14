@@ -26,7 +26,7 @@ async function run(type: string | undefined, options: GenerateCodeParameters) {
           value: GenerateType.Migration,
         },
         {
-          title: 'Code from an introspected table in a database',
+          title: 'Code from introspecting a table in the database',
           value: GenerateType.Code,
         },
       ],
@@ -41,7 +41,7 @@ async function run(type: string | undefined, options: GenerateCodeParameters) {
       break;
 
     case GenerateType.Code:
-      await generateCode({ preGenerate, postGenerate });
+      await generateCode({ preGenerate, postGenerate, fromOneTable: true });
       break;
 
     default:

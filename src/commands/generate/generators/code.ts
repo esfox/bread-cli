@@ -36,7 +36,10 @@ async function validateDatabaseConnection() {
   return true;
 }
 
-async function promptInputs(): Promise<
+async function promptInputs(
+  tables: TableMetadata[],
+  fromOneTable?: boolean,
+): Promise<
   | {
       templatesPath: string;
       outputPath: string;
@@ -50,8 +53,7 @@ async function promptInputs(): Promise<
     value: path,
   }));
 
-  const databaseTables = await getTables();
-  const tableChoices: prompts.Choice[] = databaseTables.map((table) => {
+  const tableChoices: prompts.Choice[] = tables.map((table) => {
     const { name, schema } = table;
     return {
       title: schema ? `${schema}.${name}` : name,
@@ -59,7 +61,7 @@ async function promptInputs(): Promise<
     };
   });
 
-  const inputs = await prompts([
+  const questions: prompts.PromptObject[] = [
     {
       type: 'autocomplete',
       name: 'templatesPath',
@@ -74,17 +76,22 @@ async function promptInputs(): Promise<
       choices: pathChoices,
       suggest: getAutocompleteFuzzySuggest(),
     },
-    {
+  ];
+
+  if (fromOneTable) {
+    questions.push({
       type: 'autocomplete',
       name: 'table',
       message: 'Select the database table to introspect',
       choices: tableChoices,
       suggest: getAutocompleteFuzzySuggest(),
       validate: (values: string[]) => values?.length !== 0 || 'Please select a table',
-    },
-  ]);
+    });
+  }
 
-  if (!inputs.table || inputs.table.length === 0) {
+  const inputs = await prompts(questions);
+  if (!inputs.templatesPath || !inputs.outputPath) {
+    console.log('❌ Incomplete inputs');
     return;
   }
 
@@ -129,50 +136,83 @@ function runCommand(commandType: 'pre-generate' | 'post-generate', command: stri
   return true;
 }
 
-async function getTemplateData(table: TableMetadata) {
-  const tableName = table.name;
-  const primaryKeyMap = await getPrimaryKeys([tableName]);
-  const primaryKey = primaryKeyMap[table.name];
+type TableTemplateData = {
+  schemaName?: string;
+  tableName: string;
+  primaryKey: string;
+  columns: (ColumnMetadata & { type: string })[];
+};
 
-  const columns: (ColumnMetadata & { type: string })[] = table.columns.map((column) => {
-    const { dataType, isNullable } = column;
-    let type = 'string';
-    if (isNumberType(dataType)) {
-      type = 'number';
-    } else if (isBooleanType(dataType)) {
-      type = 'boolean';
-    }
-    if (isNullable) {
-      type += ' | null';
-    }
+async function getTemplateData(tables: TableMetadata[], selectedTables: TableMetadata[]) {
+  const templateData: TableTemplateData[] = [];
+  const selectedTemplateData: TableTemplateData[] = [];
 
-    return {
-      ...column,
-      type,
+  for (const table of tables) {
+    const { name, schema, columns: columnsMeta } = table;
+    const primaryKeyMap = await getPrimaryKeys([name]);
+    const primaryKey = primaryKeyMap[name];
+
+    const columns: (ColumnMetadata & { type: string })[] = columnsMeta.map((column) => {
+      const { dataType, isNullable } = column;
+      let type = 'string';
+      if (isNumberType(dataType)) {
+        type = 'number';
+      } else if (isBooleanType(dataType)) {
+        type = 'boolean';
+      }
+      if (isNullable) {
+        type += ' | null';
+      }
+
+      return {
+        ...column,
+        type,
+      };
+    });
+
+    const tableTemplateData: TableTemplateData = {
+      schemaName: schema,
+      tableName: name,
+      primaryKey,
+      columns,
     };
-  });
 
-  console.log(`\n⌛ Generating code for table \`${tableName}\`...`);
+    templateData.push(tableTemplateData);
 
-  return {
-    tableName,
-    primaryKey,
-    columns,
-  };
+    const fullTableName = `${table.schema}.${name}`;
+    for (const selectedTable of selectedTables) {
+      const selectedTableFullName = `${selectedTable.schema}.${selectedTable.name}`;
+      if (fullTableName === selectedTableFullName) {
+        selectedTemplateData.push(tableTemplateData);
+      }
+    }
+  }
+
+  return selectedTemplateData.map((item) => ({
+    allTables: templateData,
+    ...item,
+  }));
 }
 
 export type GenerateCodeParameters = {
+  fromOneTable?: boolean;
   preGenerate?: string;
   postGenerate?: string;
 };
 
-export async function generateCode({ preGenerate, postGenerate }: GenerateCodeParameters) {
+export async function generateCode({
+  fromOneTable,
+  preGenerate,
+  postGenerate,
+}: GenerateCodeParameters) {
   const connectedToDatabase = await validateDatabaseConnection();
   if (!connectedToDatabase) {
     return;
   }
 
-  const inputs = await promptInputs();
+  const databaseTables = await getTables();
+
+  const inputs = await promptInputs(databaseTables, fromOneTable);
   if (!inputs) {
     return;
   }
@@ -184,7 +224,8 @@ export async function generateCode({ preGenerate, postGenerate }: GenerateCodePa
     return;
   }
 
-  const templateData = await getTemplateData(table);
+  const selectedTables = fromOneTable ? [table] : databaseTables;
+  const templateDataArray = await getTemplateData(databaseTables, selectedTables);
 
   if (preGenerate) {
     const preGenerateSuccess = runCommand('pre-generate', preGenerate);
@@ -193,13 +234,22 @@ export async function generateCode({ preGenerate, postGenerate }: GenerateCodePa
     }
   }
 
-  const { actions } = await hygenRun({
-    templatesPath,
-    outputPath,
-    templateData,
-  });
+  const generateActions = [];
+  for (const templateDataItem of templateDataArray) {
+    const { tableName } = templateDataItem;
 
-  if (actions.length === 0) {
+    console.log(`\n⌛ Generating code for table \`${tableName}\`...`);
+
+    const { actions } = await hygenRun({
+      templatesPath,
+      outputPath,
+      templateData: templateDataItem,
+    });
+
+    generateActions.push(actions);
+  }
+
+  if (generateActions.length === 0) {
     console.log('❌ No code was generated');
     return;
   }
