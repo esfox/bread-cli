@@ -1,6 +1,6 @@
 import { databaseConnection, databaseSchema } from '../../../constants';
 
-import { sql } from 'kysely';
+import { TableMetadata, sql } from 'kysely';
 
 export function checkConnection() {
   return sql`SELECT 1`.execute(databaseConnection);
@@ -11,7 +11,7 @@ export async function getTables() {
     withInternalKyselyTables: false,
   });
 
-  return tables.filter((table) => !table.isView);
+  return tables.filter((table) => !table.isView && table.schema === databaseSchema);
 }
 
 export async function getPrimaryKeys(tableNames: string[]) {
@@ -38,6 +38,10 @@ export async function getPrimaryKeys(tableNames: string[]) {
   }
 
   return map;
+}
+
+export function getFullTableName(table: TableMetadata) {
+  return table.schema ? `${table.schema}.${table.name}` : table.name;
 }
 
 export function isBooleanType(dataType: string) {

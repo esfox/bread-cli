@@ -3,6 +3,7 @@ import { getAutocompleteFuzzySuggest, getDirectoriesInCwd } from '../helpers';
 import { formatCodeInFolder, hygenRun } from '../helpers/code';
 import {
   checkConnection,
+  getFullTableName,
   getPrimaryKeys,
   getTables,
   isBooleanType,
@@ -53,13 +54,10 @@ async function promptInputs(
     value: path,
   }));
 
-  const tableChoices: prompts.Choice[] = tables.map((table) => {
-    const { name, schema } = table;
-    return {
-      title: schema ? `${schema}.${name}` : name,
-      value: table,
-    };
-  });
+  const tableChoices: prompts.Choice[] = tables.map((table) => ({
+    title: table.name,
+    value: table,
+  }));
 
   const questions: prompts.PromptObject[] = [
     {
@@ -147,9 +145,11 @@ async function getTemplateData(tables: TableMetadata[], selectedTables: TableMet
   const templateData: TableTemplateData[] = [];
   const selectedTemplateData: TableTemplateData[] = [];
 
+  const tableNames = tables.map((table) => table.name);
+  const primaryKeyMap = await getPrimaryKeys(tableNames);
+
   for (const table of tables) {
     const { name, schema, columns: columnsMeta } = table;
-    const primaryKeyMap = await getPrimaryKeys([name]);
     const primaryKey = primaryKeyMap[name];
 
     const columns: (ColumnMetadata & { type: string })[] = columnsMeta.map((column) => {
@@ -179,10 +179,9 @@ async function getTemplateData(tables: TableMetadata[], selectedTables: TableMet
 
     templateData.push(tableTemplateData);
 
-    const fullTableName = `${table.schema}.${name}`;
+    const fullTableName = getFullTableName(table);
     for (const selectedTable of selectedTables) {
-      const selectedTableFullName = `${selectedTable.schema}.${selectedTable.name}`;
-      if (fullTableName === selectedTableFullName) {
+      if (fullTableName === getFullTableName(selectedTable)) {
         selectedTemplateData.push(tableTemplateData);
       }
     }
