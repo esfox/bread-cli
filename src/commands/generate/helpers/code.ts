@@ -2,7 +2,7 @@ import { Logger, runner as hygenRunner } from 'hygen';
 import prompts from 'prompts';
 
 import { execSync } from 'child_process';
-import { join, sep } from 'path';
+import { sep } from 'path';
 
 export async function hygenRun({
   templatesPath,
@@ -51,10 +51,10 @@ export async function hygenRun({
   });
 }
 
-export function formatCodeInFolder(folder: string) {
-  const glob = join(folder, '**', '*');
+export function formatGeneratedCode(filePaths: string[]) {
+  const paths = filePaths.map((path) => `'${path}'`).join(' ');
   try {
-    execSync(`prettier --write --ignore-unknown '${glob}'`);
+    execSync(`prettier --write --ignore-unknown ${paths}`);
   } catch (error) {
     /* ignore error */
   }

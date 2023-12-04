@@ -1,6 +1,6 @@
 import { databaseConnectionString } from '../../../constants';
 import { getAutocompleteFuzzySuggest, getDirectoriesInCwd } from '../helpers';
-import { formatCodeInFolder, hygenRun } from '../helpers/code';
+import { formatGeneratedCode, hygenRun } from '../helpers/code';
 import {
   checkConnection,
   getFullTableName,
@@ -233,7 +233,7 @@ export async function generateCode({
     }
   }
 
-  const generateActions = [];
+  const generateActionsList = [];
   for (const templateDataItem of templateDataArray) {
     const { tableName } = templateDataItem;
 
@@ -245,12 +245,19 @@ export async function generateCode({
       templateData: templateDataItem,
     });
 
-    generateActions.push(actions);
+    generateActionsList.push(actions);
   }
 
-  if (generateActions.length === 0) {
+  if (generateActionsList.length === 0) {
     console.log('❌ No code was generated');
     return;
+  }
+
+  const generatedFiles = [];
+  for (const actions of generateActionsList) {
+    for (const action of actions) {
+      generatedFiles.push(join(outputPath, action.subject as string));
+    }
   }
 
   if (postGenerate) {
@@ -260,7 +267,7 @@ export async function generateCode({
     }
   }
 
-  formatCodeInFolder(outputPath);
+  formatGeneratedCode(generatedFiles);
 
   console.log('✔️  Done');
   console.log('🔔 Please check, inspect and validate the generated code');
